@@ -1,0 +1,4 @@
+tabula-py
+pyyaml
+PyPDF2
+discord

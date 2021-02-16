@@ -101,9 +101,13 @@ def main():
         bot.send("New companies were added:")
         bot.send(pretty_print(exec_buy, email_dt, update_dt))
     
-    from discord import File
     pdf_files = [File(f'./temp/{name}_etf.pdf') for name in paths['etf_names']]
     bot.send("For full reports see attached", files=pdf_files)
+
+    # RENEW GMAIL WATCH 
+    import gmail_client
+    gmail_client.setup_watch()
+
     bot.send("Bark going to sleep now...")
         
 

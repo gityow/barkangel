@@ -2,3 +2,10 @@ tabula-py
 pyyaml
 PyPDF2
 discord
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+google-cloud-pubsub
+python-dotenv
+Flask==1.1.2
+gunicorn==20.0.4

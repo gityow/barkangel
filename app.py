@@ -70,21 +70,21 @@ def receive_messages_handler():
             current_app.config['PUBSUB_VERIFICATION_TOKEN']):
         return 'Invalid request', 400
 
-    # # Verify that the push request originates from Cloud Pub/Sub.
-    # try:
-    #     # Get the Cloud Pub/Sub-generated JWT in the "Authorization" header.
-    #     bearer_token = request.headers.get('Authorization')
-    #     token = bearer_token.split(' ')[1]
-    #     TOKENS.append(token)
-    #     claim = id_token.verify_oauth2_token(token, requests.Request(),
-    #                                          audience='example.com')
-    #     CLAIMS.append(claim)
-    # except Exception as e:
-    #     return 'Invalid token: {}\n'.format(e), 400
+    # Verify that the push request originates from Cloud Pub/Sub.
+    try:
+        # Get the Cloud Pub/Sub-generated JWT in the "Authorization" header.
+        bearer_token = request.headers.get('Authorization')
+        token = bearer_token.split(' ')[1]
+        TOKENS.append(token)
+        claim = id_token.verify_oauth2_token(token, requests.Request(),
+                                             audience='example.com')
+        CLAIMS.append(claim)
+    except Exception as e:
+        return 'Invalid token: {}\n'.format(e), 400
 
-    # envelope = json.loads(request.data.decode('utf-8'))
-    # payload = base64.b64decode(envelope['message']['data'])
-    # MESSAGES.append(payload)
+    envelope = json.loads(request.data.decode('utf-8'))
+    payload = base64.b64decode(envelope['message']['data'])
+    MESSAGES.append(payload)
     
     main() # TODO consider calling this outside to improve latency
     

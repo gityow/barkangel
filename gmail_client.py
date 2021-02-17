@@ -1,8 +1,15 @@
+from __future__ import print_function
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
 import json
 import pickle
 import os.path
-from googleapiclient.discovery import build
 import pandas as pd
+from pandas import DataFrame
+from datetime import datetime
+import base64
 
 ################## LOAD .ENV ##################
 from os.path import join, dirname
@@ -13,6 +20,7 @@ load_dotenv(dotenv_path)
 
 WEBHOOK_ID = os.environ.get('WEBHOOK_ID')
 WEBHOOK_TOKEN = os.environ.get('WEBHOOK_TOKEN')
+PROJECT_ID = os.environ.get('PROJECT_ID')
 
 ###################################################
 
@@ -150,12 +158,14 @@ def parse_email(message_id: str) -> DataFrame:
     # message_id = "177a73785855e8fa" # simple email
 
     print(f'Parsing Email Body of {message_id}')
+    creds = get_gmail_creds()
+    service = build('gmail', 'v1', credentials=creds)
     message = service.users().messages().get(userId='me', id=message_id).execute()
 
     email_content = ''
 
     if 'data' in message['payload']['body'].keys():
-            email_content+= ark['payload']['body']['data']
+            email_content+= message['payload']['body']['data']
     else:
 
         for part in message['payload']['parts']:
@@ -170,9 +180,9 @@ def parse_email(message_id: str) -> DataFrame:
     columns = ['Num', 'Fund', 'Date', 'Direction', 'Ticker', 'CUSIP', 'Company', 'Shares', '% of ETF']
     results.columns = columns
 
-    print(result)
+    print(results)
 
-    return content
+    return results
     
 
 

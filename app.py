@@ -12,6 +12,9 @@ from google.auth.transport import requests
 from google.cloud import pubsub_v1
 from google.oauth2 import id_token
 
+from discord_bot import get_discord_bot
+from parser_email_pdf import (get_all_etfs, compare, pretty_print)
+from gmail_client import (find_ark_email, parse_email, setup_watch)
 
 with open("paths.yml", "r") as f:
     paths = yaml.load(f, Loader=yaml.FullLoader)
@@ -67,21 +70,21 @@ def receive_messages_handler():
             current_app.config['PUBSUB_VERIFICATION_TOKEN']):
         return 'Invalid request', 400
 
-    # Verify that the push request originates from Cloud Pub/Sub.
-    try:
-        # Get the Cloud Pub/Sub-generated JWT in the "Authorization" header.
-        bearer_token = request.headers.get('Authorization')
-        token = bearer_token.split(' ')[1]
-        TOKENS.append(token)
-        claim = id_token.verify_oauth2_token(token, requests.Request(),
-                                             audience='example.com')
-        CLAIMS.append(claim)
-    except Exception as e:
-        return 'Invalid token: {}\n'.format(e), 400
+    # # Verify that the push request originates from Cloud Pub/Sub.
+    # try:
+    #     # Get the Cloud Pub/Sub-generated JWT in the "Authorization" header.
+    #     bearer_token = request.headers.get('Authorization')
+    #     token = bearer_token.split(' ')[1]
+    #     TOKENS.append(token)
+    #     claim = id_token.verify_oauth2_token(token, requests.Request(),
+    #                                          audience='example.com')
+    #     CLAIMS.append(claim)
+    # except Exception as e:
+    #     return 'Invalid token: {}\n'.format(e), 400
 
-    envelope = json.loads(request.data.decode('utf-8'))
-    payload = base64.b64decode(envelope['message']['data'])
-    MESSAGES.append(payload)
+    # envelope = json.loads(request.data.decode('utf-8'))
+    # payload = base64.b64decode(envelope['message']['data'])
+    # MESSAGES.append(payload)
     
     main() # TODO consider calling this outside to improve latency
     
@@ -107,20 +110,16 @@ def main():
     bot.send(content="Hey there! New Ark Email Received. I'm taking a look at current ARK ETF Holdings... woof!")
 
     # PARSE PDFs
-    import parser_email_pdf
-    all_etfs_df, update_dt = parse_email.get_all_etfs(latest=True)
+    all_etfs_df, update_dt = get_all_etfs(latest=True)
     print('Parsing complete')
 
     # GET NEW EMAIL
-    import gmail_client
-    message_id, email_dt = gmail_client.find_ark_email()
-    email_df = gmail_client.parse_email(message_id)
+    message_id, email_dt = find_ark_email()
+    email_df = parse_email(message_id)
     print('new email parsed')
 
     # COMPARE DFs
-    import parse_email
-    exec_buy = parse_email.compare(email_df, all_etfs_df)
-    
+    exec_buy = compare(email_df, all_etfs_df)
     bot.send("Woof! Analysis Complete! ")
 
     # REPORT RESULTS
@@ -135,8 +134,7 @@ def main():
     bot.send("For full reports see attached", files=pdf_files)
 
     # RENEW GMAIL WATCH 
-    import gmail_client
-    gmail_client.setup_watch()
+    setup_watch()
 
     bot.send("Bark going to sleep now...")
         

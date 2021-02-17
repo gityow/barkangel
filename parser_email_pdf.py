@@ -16,9 +16,9 @@ arkw_etf_url = paths["arkw_etf"]
 arkg_etf_url = paths["arkg_etf"]
 arkf_etf_url = paths["arkf_etf"]
 
-def download_pdf(url):
+def download_pdf(url, fund_name):
     response = requests.get(url)
-    with open('./temp/arkk_etf.pdf', 'wb') as f:
+    with open(f'./temp/{fund_name}_etf.pdf', 'wb') as f:
         f.write(response.content)
 
 
@@ -92,13 +92,14 @@ def get_latest_date(pdf_path: str):
 
 def parse_email_table(html_string):
     import pandas as pd
-    
+    print('parsing new email')
     results = pd.read_html(html_string)[0]
     results = results[1:]
     columns = ['Num', 'Fund', 'Date', 'Direction', 'Ticker', 'CUSIP', 'Company', 'Shares', '% of ETF']
     results.columns = columns
 
-    return content
+    print(results)
+    return results
 
 def get_all_etfs(latest:bool):
     
@@ -111,7 +112,7 @@ def get_all_etfs(latest:bool):
         print('Downloading all PDFs now')
         for name in all_etfs:
             url = paths[f'{name}_etf']        
-            parse_email.download_pdf(url) # save in temp folder
+            download_pdf(url, name) # save in temp folder
     
     # PARSE PDF
     for name in all_etfs:
@@ -125,6 +126,8 @@ def get_all_etfs(latest:bool):
         print(f"{name} PDF updated as of {update_dt}")
 
         all_results = all_results.append(result_df,ignore_index=True)
+
+        print(all_results)
     
     return all_results, update_dt
 
@@ -136,7 +139,8 @@ def compare(email_df: DataFrame, all_etf_df: DataFrame):
     
     return_cols = ['Fund', 'Ticker', 'Company']
 
-    exec_buy = exec_buy[return_cols].sort('Fund') #TODO how to sort by fun
+    exec_buy = exec_buy[return_cols].sort_values(by='Fund')
+    print(exec_buy)
 
     return exec_buy
 

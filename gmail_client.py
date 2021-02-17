@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 WEBHOOK_ID = os.environ.get('WEBHOOK_ID')
 WEBHOOK_TOKEN = os.environ.get('WEBHOOK_TOKEN')
 PROJECT_ID = os.environ.get('PROJECT_ID')

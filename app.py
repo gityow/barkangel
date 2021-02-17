@@ -52,8 +52,8 @@ def index():
     # Consider initializing the publisher client outside this function
     # for better latency performance.
     publisher = pubsub_v1.PublisherClient()
-    topic_path = publisher.topic_path(app.config['GOOGLE_CLOUD_PROJECT'],
-                                      app.config['PUBSUB_TOPIC'])
+    topic_path = publisher.topic_path(app.config['PROJECT_ID'],
+                                      app.config['TOPIC_ID'])
     future = publisher.publish(topic_path, data)
     future.result()
     return 'OK', 200

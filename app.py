@@ -83,7 +83,8 @@ def receive_messages_handler():
     payload = base64.b64decode(envelope['message']['data'])
     MESSAGES.append(payload)
     
-    main()
+    main() # TODO consider calling this outside to improve latency
+    
     # Returning any 2xx status indicates successful receipt of the message.
     return 'OK', 200
 

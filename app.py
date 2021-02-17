@@ -1,14 +1,65 @@
 import logging
 import requests
 from discord import File
-from flask import Flask, request
+from flask import current_app, Flask, render_template, request, Flask, request
 import yaml
+import base64
+import json
+import logging
+import os
+
+from google.auth.transport import requests
+from google.cloud import pubsub_v1
+from google.oauth2 import id_token
+
 
 with open("paths.yml", "r") as f:
     paths = yaml.load(f, Loader=yaml.FullLoader)
 
+################## LOAD .ENV ##################
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+###################################################
+
 app = Flask(__name__)
 
+# Configure the following environment variables via app.yaml
+# This is used in the push request handler to verify that the request came from
+# pubsub and originated from a trusted source.
+app.config['PUBSUB_VERIFICATION_TOKEN'] = \
+    os.environ['PUBSUB_VERIFICATION_TOKEN']
+app.config['TOPIC_ID'] = os.environ['TOPIC_ID']
+app.config['PROJECT_ID'] = os.environ['PROJECT_ID']
+
+# Global list to store messages, tokens, etc. received by this instance.
+MESSAGES = []
+TOKENS = []
+CLAIMS = []
+
+# [START index]
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'GET':
+        return render_template('index.html', messages=MESSAGES, tokens=TOKENS,
+                               claims=CLAIMS)
+
+    data = request.form.get('payload', 'Example payload').encode('utf-8')
+
+    # Consider initializing the publisher client outside this function
+    # for better latency performance.
+    publisher = pubsub_v1.PublisherClient()
+    topic_path = publisher.topic_path(app.config['GOOGLE_CLOUD_PROJECT'],
+                                      app.config['PUBSUB_TOPIC'])
+    future = publisher.publish(topic_path, data)
+    future.result()
+    return 'OK', 200
+# [END index]
+
+# [START push]
 @app.route('/push-handlers/receive_messages', methods=['POST'])
 def receive_messages_handler():
     # Verify that the request originates from the application.
@@ -22,15 +73,6 @@ def receive_messages_handler():
         bearer_token = request.headers.get('Authorization')
         token = bearer_token.split(' ')[1]
         TOKENS.append(token)
-
-        # Verify and decode the JWT. `verify_oauth2_token` verifies
-        # the JWT signature, the `aud` claim, and the `exp` claim.
-        # Note: For high volume push requests, it would save some network
-        # overhead if you verify the tokens offline by downloading Google's
-        # Public Cert and decode them using the `google.auth.jwt` module;
-        # caching already seen tokens works best when a large volume of
-        # messages have prompted a single push server to handle them, in which
-        # case they would all share the same token for a limited time window.
         claim = id_token.verify_oauth2_token(token, requests.Request(),
                                              audience='example.com')
         CLAIMS.append(claim)
@@ -45,21 +87,8 @@ def receive_messages_handler():
     # Returning any 2xx status indicates successful receipt of the message.
     return 'OK', 200
 
-# @app.route('/new_email', methods=['GET'])
-# def hello():
-#     """ Wake up Bark """
-    
-#     if request.method == 'GET':
-#         payload = request.args
-#         print(user)
 
-#         print('An email from ARK was received')
 
-#         main()
-
-        
-
-#     return 200
 
 
 @app.errorhandler(500)

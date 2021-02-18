@@ -49,18 +49,26 @@ def index():
     if request.method == 'GET':
         return render_template('index.html', messages=MESSAGES, tokens=TOKENS,
                                claims=CLAIMS)
-
-    data = request.form.get('payload', 'Example payload').encode('utf-8')
-
-    # Consider initializing the publisher client outside this function
-    # for better latency performance.
-    publisher = pubsub_v1.PublisherClient()
-    topic_path = publisher.topic_path(app.config['PROJECT_ID'],
-                                      app.config['TOPIC_ID'])
-    future = publisher.publish(topic_path, data)
-    future.result()
-    return 'OK', 200
+    
 # [END index]
+
+# [START send_message]
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    if request.method == 'POST':
+        data = request.form.get('payload', 'Example payload').encode('utf-8')
+
+        # Consider initializing the publisher client outside this function
+        # for better latency performance.
+        publisher = pubsub_v1.PublisherClient()
+        topic_path = publisher.topic_path(app.config['PROJECT_ID'],
+                                        app.config['TOPIC_ID'])
+        future = publisher.publish(topic_path, data)
+        future.result()
+
+        return 'OK', 200
+        
+# [END send_message]
 
 # [START push]
 @app.route('/push-handlers/receive_messages', methods=['POST'])
@@ -76,8 +84,7 @@ def receive_messages_handler():
         bearer_token = request.headers.get('Authorization')
         token = bearer_token.split(' ')[1]
         TOKENS.append(token)
-        claim = id_token.verify_oauth2_token(token, requests.Request(),
-                                             audience='example.com')
+        claim = id_token.verify_oauth2_token(token, requests.Request(),audience='example.com')
         CLAIMS.append(claim)
     except Exception as e:
         return 'Invalid token: {}\n'.format(e), 400
@@ -90,9 +97,6 @@ def receive_messages_handler():
     
     # Returning any 2xx status indicates successful receipt of the message.
     return 'OK', 200
-
-
-
 
 
 @app.errorhandler(500)

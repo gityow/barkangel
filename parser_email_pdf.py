@@ -18,7 +18,9 @@ arkf_etf_url = paths["arkf_etf"]
 
 def download_pdf(url, fund_name):
     response = requests.get(url)
-    with open(f'./temp/{fund_name}_etf.pdf', 'wb') as f:
+    tmp_path = paths[f'{fund_name}_etf_path']
+    
+    with open(tmp_path, 'wb') as f:
         f.write(response.content)
 
 

@@ -2,27 +2,27 @@ etf_names: ['arkk', 'arkq', 'arkw' , 'arkg', 'arkf']
 
 arkk_etf: "https://ark-funds.com/wp-content/fundsiteliterature/holdings/ARK_INNOVATION_ETF_ARKK_HOLDINGS.pdf"
 temp_arkk_etf: "./temp/ARK_INNOVATION_ETF_ARKK_HOLDINGS.pdf"
-arkk_etf_path: "./temp/arkk_etf.pdf"
+arkk_etf_path: "/tmp/arkk_etf.pdf"
 
 
 arkq_etf: "https://ark-funds.com/wp-content/fundsiteliterature/holdings/ARK_AUTONOMOUS_TECHNOLOGY_&_ROBOTICS_ETF_ARKQ_HOLDINGS.pdf"
 temp_arkq_etf: "./temp/ARK_AUTONOMOUS_TECHNOLOGY_&_ROBOTICS_ETF_ARKQ_HOLDINGS.pdf"
-arkq_etf_path: "./temp/arkq_etf.pdf"
+arkq_etf_path: "/tmp/arkq_etf.pdf"
 
 
 arkw_etf: "https://ark-funds.com/wp-content/fundsiteliterature/holdings/ARK_NEXT_GENERATION_INTERNET_ETF_ARKW_HOLDINGS.pdf"
 temp_arkw_etf: "./temp/ARK_NEXT_GENERATION_INTERNET_ETF_ARKW_HOLDINGS.pdf"
-arkw_etf_path: "./temp/arkw_etf.pdf"
+arkw_etf_path: "/tmp/arkw_etf.pdf"
 
 
 arkg_etf: "https://ark-funds.com/wp-content/fundsiteliterature/holdings/ARK_GENOMIC_REVOLUTION_MULTISECTOR_ETF_ARKG_HOLDINGS.pdf"
 temp_arkg_etf: "./temp/ARK_GENOMIC_REVOLUTION_MULTISECTOR_ETF_ARKG_HOLDINGS.pdf"
-arkg_etf_path: "./temp/arkg_etf.pdf"
+arkg_etf_path: "/tmp/arkg_etf.pdf"
 
 
 arkf_etf: "https://ark-funds.com/wp-content/fundsiteliterature/holdings/ARK_FINTECH_INNOVATION_ETF_ARKF_HOLDINGS.pdf"
 temp_arkf_etf: "./temp/ARK_FINTECH_INNOVATION_ETF_ARKF_HOLDINGS.pdf"
-arkf_etf_path: "./temp/arkf_etf.pdf"
+arkf_etf_path: "/tmp/arkf_etf.pdf"
 
 
 test_message_id: "177a725558a62689"

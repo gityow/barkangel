@@ -16,6 +16,8 @@ from discord_bot import get_discord_bot
 from parser_email_pdf import (get_all_etfs, compare, pretty_print)
 from gmail_client import (find_ark_email, parse_email, setup_watch)
 
+import threading
+
 with open("paths.yml", "r") as f:
     paths = yaml.load(f, Loader=yaml.FullLoader)
 
@@ -29,6 +31,7 @@ load_dotenv(dotenv_path)
 ###################################################
 
 app = Flask(__name__)
+#  api = Api(app)
 
 # Configure the following environment variables via app.yaml
 # This is used in the push request handler to verify that the request came from
@@ -67,7 +70,7 @@ def send_message():
         future.result()
 
         return 'OK', 200
-        
+
 # [END send_message]
 
 # [START push]
@@ -77,26 +80,27 @@ def receive_messages_handler():
     if (request.args.get('token', '') !=
             current_app.config['PUBSUB_VERIFICATION_TOKEN']):
         return 'Invalid request', 400
-
-    # Verify that the push request originates from Cloud Pub/Sub.
-    try:
-        # Get the Cloud Pub/Sub-generated JWT in the "Authorization" header.
-        bearer_token = request.headers.get('Authorization')
-        token = bearer_token.split(' ')[1]
-        TOKENS.append(token)
-        claim = id_token.verify_oauth2_token(token, requests.Request(),audience='example.com')
-        CLAIMS.append(claim)
-    except Exception as e:
-        return 'Invalid token: {}\n'.format(e), 400
-
-    envelope = json.loads(request.data.decode('utf-8'))
-    payload = base64.b64decode(envelope['message']['data'])
-    MESSAGES.append(payload)
     
-    main() # TODO consider calling this outside to improve latency
+    # Verify that the push request originates from Cloud Pub/Sub.
+    # try:
+    #     # Get the Cloud Pub/Sub-generated JWT in the "Authorization" header.
+    #     bearer_token = request.headers.get('Authorization')
+    #     token = bearer_token.split(' ')[1]
+    #     TOKENS.append(token)
+    #     claim = id_token.verify_oauth2_token(token, requests.Request(),audience='example.com')
+    #     CLAIMS.append(claim)
+    # except Exception as e:
+    #     return 'Invalid token: {}\n'.format(e), 400
+
+    # envelope = json.loads(request.data.decode('utf-8'))
+    # payload = base64.b64decode(envelope['message']['data'])
+    # MESSAGES.append(payload)
+    
+    threading.Thread(target=task).start()  # TODO consider calling this outside to improve latency
     
     # Returning any 2xx status indicates successful receipt of the message.
     return 'OK', 200
+    
 
 
 @app.errorhandler(500)
@@ -108,7 +112,11 @@ def server_error(e):
     """.format(e), 500
 
     
-def main():
+def task():
+    
+    print('Started task...')
+    print(threading.current_thread().name) 
+
     # START PROCESS
     bot = get_discord_bot()
     bot.send(content="Hey there! New Ark Email Received. I'm taking a look at current ARK ETF Holdings... woof!")
@@ -146,4 +154,5 @@ def main():
 if __name__ == '__main__':
     # This is used when running locally. Gunicorn is used to run the
     # application on Google App Engine. See entrypoint in app.yaml.
+    #app.run(port=8080,debug=True)
     app.run(debug=True)

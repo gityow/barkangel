@@ -49,7 +49,7 @@ def get_gmail_creds():
                 './creds/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('./creds/token.pickle', 'wb') as token:
+        with open('/tmp/token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
     return creds

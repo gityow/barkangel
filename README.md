@@ -5,8 +5,29 @@ Setup Instructions
 3. mkdir creds folder
 4. Make a `credentials.json` file, this is login for the gmail api.
 5. Get google app crednetials and save in creds folder. For more information, see https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating_service_account_keys . Set the path of this in the `.env` file under `GOOGLE_APPLICATION_CREDENTIALS`
-6. Grant 
+
+Deploy locally
+1. `python main.py`
+2. Make a curl request
+`curl --header "Content-Type: application/json" -d @sample_message.json http://localhost:8080/push-handlers/receive_messages?token=test`
 
 
 References:  
 - setting up pub/sub push notifications https://cloud.google.com/run/docs/tutorials/pubsub#looking_at_the_code
+- pubsub app engine code sample https://github.com/GoogleCloudPlatform/python-docs-samples/tree/master/appengine/standard_python3/pubsub
+- app.yaml file configuration for app engine https://cloud.google.com/appengine/docs/standard/python3/config/appref#handlers_element
+- deploying flask app python37 on GCP https://medium.com/@dmahugh_70618/deploying-a-flask-app-to-google-app-engine-faa883b5ffab
+- https://cloud.google.com/appengine/docs/standard/python3/using-temp-files
+- pdf reader without java https://towardsdatascience.com/how-to-extract-text-from-pdf-245482a96de7
+- good read on authentication but not using these credentials https://realpython.com/flask-google-login/
+- these were my vibes https://medium.com/analytics-vidhya/deployment-blues-why-wont-my-flask-web-app-just-deploy-2ac9092a1b40#c18b
+- all files deployed on GAE https://stackoverflow.com/questions/40805182/see-the-files-that-will-be-deploy-to-google-appengine
+- absolute and relative paths on GAE https://stackoverflow.com/questions/5050615/how-to-get-application-root-path-in-gae
+
+Feature Roadmap:
+- use content of push notification to parse email
+- persisting data and loading to a database to track changes over time - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
+- using java sdk in python runtime
+
+
+

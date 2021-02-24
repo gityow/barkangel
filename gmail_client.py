@@ -25,6 +25,7 @@ PROJECT_ID = os.environ.get('PROJECT_ID')
 
 ###################################################
 
+
 def get_gmail_creds():
     """returns credentials to build gmail api service
 
@@ -37,8 +38,11 @@ def get_gmail_creds():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('./creds/token.pickle'):
-        with open('./creds/token.pickle', 'rb') as token:
+    creds_path = os.path.join(os.path.dirname(__file__), '..', 'creds', 'token.pickle')
+    creds_json_path = os.path.join(os.path.dirname(__file__), '..', 'creds', 'credentials.json')
+
+    if os.path.exists(creds_path):
+        with open(creds_path, 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -46,10 +50,10 @@ def get_gmail_creds():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                './creds/credentials.json', SCOPES)
+                creds_json_path, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('/tmp/token.pickle', 'wb') as token:
+        with open("/tmp/token.pickle", 'wb') as token:
             pickle.dump(creds, token)
 
     return creds

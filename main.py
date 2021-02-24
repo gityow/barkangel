@@ -96,7 +96,8 @@ def receive_messages_handler():
     # payload = base64.b64decode(envelope['message']['data'])
     # MESSAGES.append(payload)
     
-    threading.Thread(target=task).start()  # TODO consider calling this outside to improve latency
+    #threading.Thread(target=task).start()  # TODO consider calling this outside to improve latency
+    task()
     
     # Returning any 2xx status indicates successful receipt of the message.
     return 'OK', 200
@@ -115,7 +116,7 @@ def server_error(e):
 def task():
     
     print('Started task...')
-    print(threading.current_thread().name) 
+    #print(threading.current_thread().name) 
 
     # START PROCESS
     bot = get_discord_bot()

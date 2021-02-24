@@ -1,4 +1,3 @@
-tabula-py
 pyyaml
 PyPDF2
 discord
@@ -10,4 +9,6 @@ python-dotenv
 Flask==1.1.2
 gunicorn==20.0.4
 install-jdk
-threading
+lxml
+# brew install imagemagick # for pdf parsing debugging
+# Wand # for pdf parsing debugging

@@ -25,6 +25,7 @@ References:
 - absolute and relative paths on GAE https://stackoverflow.com/questions/5050615/how-to-get-application-root-path-in-gae
 
 Feature Roadmap:
+- refine push notification criteria (currently pushes upon new draft, read email)
 - use content of push notification to parse email
 - persisting data and loading to a database to track changes over time - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
 - using java sdk in python runtime

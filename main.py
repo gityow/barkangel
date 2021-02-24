@@ -16,7 +16,7 @@ from discord_bot import get_discord_bot
 from parser_email_pdf import (get_all_etfs, compare, pretty_print)
 from gmail_client import (find_ark_email, parse_email, setup_watch)
 
-import threading
+# import threading
 
 with open("paths.yml", "r") as f:
     paths = yaml.load(f, Loader=yaml.FullLoader)

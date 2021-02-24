@@ -142,7 +142,7 @@ def task():
         bot.send("New companies were added:")
         bot.send(pretty_print(exec_buy, email_dt, update_dt))
     
-    pdf_files = [File(f'./temp/{name}_etf.pdf') for name in paths['etf_names']]
+    pdf_files = [File(f'/tmp/{name}_etf.pdf') for name in paths['etf_names']]
     bot.send("For full reports see attached", files=pdf_files)
 
     # RENEW GMAIL WATCH 

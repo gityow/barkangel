@@ -1,4 +1,3 @@
-import tabula
 import yaml
 import numpy as np
 import pandas as pd
@@ -6,6 +5,7 @@ from pandas import DataFrame
 import PyPDF2
 import requests
 import re
+
 
 with open("paths.yml", "r") as f:
     paths = yaml.load(f, Loader=yaml.FullLoader)
@@ -23,8 +23,7 @@ def download_pdf(url, fund_name):
     with open(tmp_path, 'wb') as f:
         f.write(response.content)
 
-
-def parse_etf_holdings(pdf_path: str):
+def parse_etf_holdings_java(pdf_path: str):
     columns = [
         "NUM",
         "COMPANY",
@@ -58,6 +57,35 @@ def parse_etf_holdings(pdf_path: str):
 
     return result_df
 
+def parse_etf_holdings(pdf_path: str):
+    columns = [
+        "NUM",
+        "COMPANY",
+        "TICKER",
+        "CUSIP",
+        "SHARES",
+        "MARKET_VALUE($)",
+        "WEIGHT(%)",
+    ]
+
+    with open(pdf_path,'rb') as f:
+        reader = PyPDF2.PdfFileReader(f)
+        contents = reader.getPage(0).extractText()
+    
+
+    string_list = contents.split('\n')
+    i = 8
+    df_list = []
+    try:
+        while int(string_list[i]): # index of the row
+            print('index', i)
+            print(string_list[i:i+7])
+            df_list.append(string_list[i:i+7])
+            i += 7
+    except ValueError: # EOF "The principal risks of investing"
+        df = pd.DataFrame(df_list, columns = columns)
+    
+    return df
 
 def check_columns(df: DataFrame):
     """
@@ -93,7 +121,7 @@ def get_latest_date(pdf_path: str):
     
 
 def parse_email_table(html_string):
-    import pandas as pd
+    
     print('parsing new email')
     results = pd.read_html(html_string)[0]
     results = results[1:]

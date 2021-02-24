@@ -38,8 +38,8 @@ def get_gmail_creds():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    creds_path = os.path.join(os.path.dirname(__file__), '..', 'creds', 'token.pickle')
-    creds_json_path = os.path.join(os.path.dirname(__file__), '..', 'creds', 'credentials.json')
+    creds_path = os.path.join(os.path.dirname(__file__), 'creds', 'token.pickle')
+    creds_json_path = os.path.join(os.path.dirname(__file__), 'creds', 'credentials.json')
 
     if os.path.exists(creds_path):
         with open(creds_path, 'rb') as token:

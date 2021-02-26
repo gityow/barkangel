@@ -9,6 +9,19 @@ from google.auth import jwt
 # Documentation of pubsub here
 # https://googleapis.dev/python/pubsub/latest/index.html
 
+############################# LOAD .ENV #############################
+from os.path import join, dirname
+from dotenv import load_dotenv, find_dotenv
+import os
+
+CURR_PATH = os.getcwd()
+dotenv_path = join(CURR_PATH, '.env')
+load_dotenv(dotenv_path)
+
+GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+#########################################################################
+
+
 def get_gcloud_creds():
 
     service_account_info = json.load(open(GOOGLE_APPLICATION_CREDENTIALS))

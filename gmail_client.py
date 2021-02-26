@@ -11,20 +11,21 @@ from pandas import DataFrame
 from datetime import datetime
 import base64
 
-################## LOAD .ENV ##################
+######################################## LOAD .ENV ########################################
 from os.path import join, dirname
 from dotenv import load_dotenv
+import os
 
-dotenv_path = join(dirname(__file__), '.env')
+CURR_PATH = os.getcwd()
+dotenv_path = join(CURR_PATH, '.env')
 load_dotenv(dotenv_path)
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 WEBHOOK_ID = os.environ.get('WEBHOOK_ID')
 WEBHOOK_TOKEN = os.environ.get('WEBHOOK_TOKEN')
 PROJECT_ID = os.environ.get('PROJECT_ID')
-
-###################################################
-
+GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+####################################################################################
 
 def get_gmail_creds():
     """returns credentials to build gmail api service
@@ -38,8 +39,10 @@ def get_gmail_creds():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    creds_path = os.path.join(os.path.dirname(__file__), 'creds', 'token.pickle')
-    creds_json_path = os.path.join(os.path.dirname(__file__), 'creds', 'credentials.json')
+    
+
+    creds_path = os.path.join(CURR_PATH, 'creds', 'token.pickle')
+    creds_json_path = os.path.join(CURR_PATH, 'creds', 'credentials.json')
 
     if os.path.exists(creds_path):
         with open(creds_path, 'rb') as token:
@@ -66,7 +69,7 @@ def setup_watch():
     creds = get_gmail_creds()
 
     request = {
-    'labelIds': ['INBOX'],
+    'labelIds': ['Label_4122650900776215210'],
     'topicName': f'projects/{PROJECT_ID}/topics/gmail_trigger'
     }
 

@@ -7,7 +7,9 @@ Setup Instructions
 5. Get google app crednetials and save in creds folder. For more information, see https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating_service_account_keys . Set the path of this in the `.env` file under `GOOGLE_APPLICATION_CREDENTIALS`
 
 Deploy locally
-1. `python main.py`
+1. `$ export FLASK_APP=hello.py`
+   `$ export FLASK_ENV=development`
+   `$ flask run`
 2. Make a curl request
 `curl --header "Content-Type: application/json" -d @sample_message.json http://localhost:8080/push-handlers/receive_messages?token=test`
 
@@ -25,7 +27,7 @@ References:
 - absolute and relative paths on GAE https://stackoverflow.com/questions/5050615/how-to-get-application-root-path-in-gae
 
 Feature Roadmap:
-- refine push notification criteria (currently pushes upon new draft, read email)
+- refine push notification criteria (currently pushes upon new draft, read email, moved to bin)
 - use content of push notification to parse email
 - persisting data and loading to a database to track changes over time - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
 - using java sdk in python runtime

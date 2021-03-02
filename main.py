@@ -16,19 +16,19 @@ from parser_email_pdf import (get_all_etfs, compare, pretty_print)
 from gmail_client import (find_ark_email, parse_email, setup_watch)
 
 import threading
-# import google.cloud.logging
+import google.cloud.logging
 
 
 ################## GOOGLE LOGGING ##################
 # Instantiates a client
-# client = google.cloud.logging.Client()
+client = google.cloud.logging.Client()
 
 # Retrieves a Cloud Logging handler based on the environment
 # you're running in and integrates the handler with the
 # Python logging module. By default this captures all logs
 # at INFO level and higher
-# client.get_default_handler()
-# client.setup_logging()
+client.get_default_handler()
+client.setup_logging()
 
 # Imports Python standard library logging
 import logging

@@ -20,8 +20,8 @@ def get_discord_bot(dev=False):
 
     # Create webhook
     if dev:
-        webhook = Webhook.partial(WEBHOOK_ID, WEBHOOK_TOKEN, adapter=RequestsWebhookAdapter())
-    else:
         webhook = Webhook.partial(WEBHOOK_ID_DEBUG, WEBHOOK_TOKEN_DEBUG, adapter=RequestsWebhookAdapter())
+    else:
+        webhook = Webhook.partial(WEBHOOK_ID, WEBHOOK_TOKEN, adapter=RequestsWebhookAdapter())
     
     return webhook

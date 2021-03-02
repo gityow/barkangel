@@ -9,6 +9,13 @@ from google.auth import jwt
 # Documentation of pubsub here
 # https://googleapis.dev/python/pubsub/latest/index.html
 
+####################### LOGGING ###########################
+# Imports Python standard library logging
+import logging
+
+logger = logging.getLogger(__name__)
+##########################################################
+
 ############################# LOAD .ENV #############################
 from os.path import join, dirname
 from dotenv import load_dotenv, find_dotenv
@@ -38,7 +45,7 @@ def sub_listen():
     subscriber = pubsub.SubscriberClient(credentials=creds)
     subscription_path = subscriber.subscription_path(PROJECT_ID, SUBSCRIPTION_ID)
 
-    print(f"Listening for messages on {subscription_path}..\n")
+    logger.info(f"Listening for messages on {subscription_path}..\n")
     
     # Pull Messages Synchronously
     response = subscriber.pull(request={
@@ -47,7 +54,7 @@ def sub_listen():
     })
 
     for msg in response.received_messages:
-        print("Received message:", msg.message.data)
+        logger.info("Received message:", msg.message.data)
     
     ack_ids = [msg.ack_id for msg in response.received_messages]
     subscriber.acknowledge(

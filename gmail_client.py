@@ -11,6 +11,13 @@ from pandas import DataFrame
 from datetime import datetime
 import base64
 
+######################################## LOGGING ########################################
+# Imports Python standard library logging
+import logging
+
+logger = logging.getLogger(__name__)
+####################################################################################
+
 ######################################## LOAD .ENV ########################################
 from os.path import join, dirname
 from dotenv import load_dotenv
@@ -75,7 +82,7 @@ def setup_watch():
 
     service = build('gmail', 'v1', credentials=creds)
     resp = service.users().watch(userId='me', body=request).execute()
-    print(resp)
+    logger.info(resp)
 
     return resp
 
@@ -90,11 +97,11 @@ def get_gmail_labels():
     labels = results.get('labels', [])
 
     if not labels:
-        print('No labels found.')
+        logger.info('No labels found.')
     else:
-        print('Labels:')
+        logger.info('Labels:')
         for label in labels:
-            print(label['name'])
+            logger.info(label['name'])
 
 def get_mail_list(history_id):
     creds = get_gmail_creds()
@@ -104,16 +111,16 @@ def get_mail_list(history_id):
         
     for i in message_ids:
         mes_id = i['id']
-        print(f'----- looking at: {mes_id} -----', )
+        logger.info(f'----- looking at: {mes_id} -----', )
 
         mes = service.users().messages().get(userId='me', id=mes_id).execute()
 
-        print('history id is :', mes['historyId'])
-        print('mimetype is :', mes['payload']['mimeType'])
-        print(f"{mes['payload']['headers'][-6]['name']} is : {mes['payload']['headers'][-6]['value']}" ) # from
-        print(f"{mes['payload']['headers'][-3]['name']} is : {mes['payload']['headers'][-3]['value']}" ) # subject
+        logger.info('history id is :', mes['historyId'])
+        logger.info('mimetype is :', mes['payload']['mimeType'])
+        logger.info(f"{mes['payload']['headers'][-6]['name']} is : {mes['payload']['headers'][-6]['value']}" ) # from
+        logger.info(f"{mes['payload']['headers'][-3]['name']} is : {mes['payload']['headers'][-3]['value']}" ) # subject
         if mes['historyId'] == history_id: 
-            print(mes)
+            logger.info(mes)
 
 def find_ark_email():
     """ Return id of email
@@ -125,7 +132,7 @@ def find_ark_email():
     """
     creds = get_gmail_creds()
     service = build('gmail', 'v1', credentials=creds)
-    print('getting all emails')
+    logger.info('getting all emails')
     message_ids = service.users().messages().list(userId='me',labelIds=['Label_4122650900776215210'],includeSpamTrash=False).execute()['messages']
     
     max_id = 0
@@ -133,7 +140,7 @@ def find_ark_email():
 
     for i in message_ids:
         mes_id = i['id']
-        print(f'looking at {mes_id}')
+        logger.info(f'looking at {mes_id}')
         mes = service.users().messages().get(userId='me', id=mes_id).execute()
         # find most recent email
         if int(mes['internalDate'])/1000.0 > max_epoch_ms :
@@ -142,7 +149,7 @@ def find_ark_email():
         
     
     email_date_time = datetime.fromtimestamp(max_epoch_ms).strftime('%Y-%m-%d %H:%M:%S')
-    print(f'found most recent ark email id {max_id} sent on :', email_date_time)
+    logger.info(f'found most recent ark email id {max_id} sent on :', email_date_time)
 
     return (max_id, email_date_time)
 
@@ -165,7 +172,7 @@ def parse_email(message_id: str) -> DataFrame:
     # message_id = "177a725558a62689" # test ARK email
     # message_id = "177a73785855e8fa" # simple email
 
-    print(f'Parsing Email Body of {message_id}')
+    logger.info(f'Parsing Email Body of {message_id}')
     creds = get_gmail_creds()
     service = build('gmail', 'v1', credentials=creds)
     message = service.users().messages().get(userId='me', id=message_id).execute()
@@ -181,14 +188,14 @@ def parse_email(message_id: str) -> DataFrame:
     
     mes_bytes = bytes(str(email_content),encoding='utf-8')
     html_string = base64.urlsafe_b64decode(mes_bytes)
-    print(f'Found the following html body \n {html_string}')
+    logger.info(f'Found the following html body \n {html_string}')
     
     results = pd.read_html(html_string)[0]
     results = results[1:]
     columns = ['Num', 'Fund', 'Date', 'Direction', 'Ticker', 'CUSIP', 'Company', 'Shares', '% of ETF']
     results.columns = columns
 
-    print(results)
+    logger.info(results)
 
     return results
     

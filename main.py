@@ -15,8 +15,28 @@ from google.oauth2 import id_token
 from discord_bot import get_discord_bot
 from parser_email_pdf import (get_all_etfs, compare, pretty_print)
 from gmail_client import (find_ark_email, parse_email, setup_watch)
+from utils import 
 
 import threading
+import google.cloud.logging
+
+
+################## GOOGLE LOGGING ##################
+# Instantiates a client
+client = google.cloud.logging.Client()
+
+# Retrieves a Cloud Logging handler based on the environment
+# you're running in and integrates the handler with the
+# Python logging module. By default this captures all logs
+# at INFO level and higher
+client.get_default_handler()
+client.setup_logging()
+
+# Imports Python standard library logging
+import logging
+
+logger = logging.getLogger(__name__)
+##########################################################
 
 with open("paths.yml", "r") as f:
     paths = yaml.load(f, Loader=yaml.FullLoader)
@@ -28,12 +48,6 @@ from dotenv import load_dotenv
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
-###################################################
-
-app = Flask(__name__)
-#  api = Api(app)
-
-# Configure the following environment variables via app.yaml
 # This is used in the push request handler to verify that the request came from
 # pubsub and originated from a trusted source.
 app.config['PUBSUB_VERIFICATION_TOKEN'] = \
@@ -41,10 +55,17 @@ app.config['PUBSUB_VERIFICATION_TOKEN'] = \
 app.config['TOPIC_ID'] = os.environ['TOPIC_ID']
 app.config['PROJECT_ID'] = os.environ['PROJECT_ID']
 
+###################################################
+
+app = Flask(__name__)
+#  api = Api(app)
+
+
 # Global list to store messages, tokens, etc. received by this instance.
 MESSAGES = []
 TOKENS = []
 CLAIMS = []
+
 
 # [START index]
 @app.route('/', methods=['GET', 'POST'])
@@ -96,13 +117,25 @@ def receive_messages_handler():
     # payload = base64.b64decode(envelope['message']['data'])
     # MESSAGES.append(payload)
     
-    threading.Thread(target=task).start()  # TODO consider calling this outside to improve latency
+    threading.Thread(target=task_send_message).start()  # TODO consider calling this outside to improve latency
     #task()
     
     # Returning any 2xx status indicates successful receipt of the message.
     return 'OK', 200
-    
+# [END push]
 
+# [START download]
+@app.route('/download', methods=['POST'])
+def receive_messages_handler():
+    if (request.args.get('token', '') !=
+            current_app.config['PUBSUB_VERIFICATION_TOKEN']):
+        return 'Invalid request', 400
+    debug_flg = request.args.get('debug', ''
+    threading.Thread(target=task_send_message).start()  # TODO consider calling this outside to improve latency
+
+    return 'OK', 200
+
+# [END download]
 
 @app.errorhandler(500)
 def server_error(e):
@@ -113,23 +146,23 @@ def server_error(e):
     """.format(e), 500
 
     
-def task():
+def task_send_message():
     
-    print('Started task...')
+    logger.info('Started task...')
     #print(threading.current_thread().name) 
 
     # START PROCESS
     bot = get_discord_bot()
     bot.send(content="Hey there! New Ark Email Received. I'm taking a look at current ARK ETF Holdings... woof!")
 
-    # PARSE PDFs
+    # GET PDFs # TODO read from blob
     all_etfs_df, update_dt = get_all_etfs(latest=True)
-    print('Parsing complete')
+    logger.info('Parsing complete')
 
     # GET NEW EMAIL
     message_id, email_dt = find_ark_email()
     email_df = parse_email(message_id)
-    print('new email parsed')
+    logger.info('new email parsed')
 
     # COMPARE DFs
     exec_buy = compare(email_df, all_etfs_df)
@@ -150,10 +183,14 @@ def task():
     setup_watch()
 
     bot.send("Bark going to sleep now...")
-        
 
-if __name__ == '__main__':
-    # This is used when running locally. Gunicorn is used to run the
-    # application on Google App Engine. See entrypoint in app.yaml.
-    #app.run(port=8080,debug=True)
-    app.run(debug=True)
+# TODO write to blob        
+def task_make_tables():
+    all_etfs_df, update_dt = get_all_etfs(latest=True)
+    
+
+# if __name__ == '__main__':
+#     # This is used when running locally. Gunicorn is used to run the
+#     # application on Google App Engine. See entrypoint in app.yaml.
+#     #app.run(port=8080,debug=True)
+#     app.run(debug=True)

@@ -13,6 +13,10 @@ Deploy locally
 2. Make a curl request
 `curl --header "Content-Type: application/json" -d @sample_message.json http://localhost:8080/push-handlers/receive_messages?token=test`
 
+Live app in app engine:
+https://barkangelinvest-1613342810822.nn.r.appspot.com
+Make a curl request
+`curl --header "Content-Type: application/json" -d @sample_message.json https://barkangelinvest-1613342810822.nn.r.appspot.com/push-handlers/receive_messages?token=test`
 
 References:  
 - setting up pub/sub push notifications https://cloud.google.com/run/docs/tutorials/pubsub#looking_at_the_code
@@ -25,12 +29,14 @@ References:
 - these were my vibes https://medium.com/analytics-vidhya/deployment-blues-why-wont-my-flask-web-app-just-deploy-2ac9092a1b40#c18b
 - all files deployed on GAE https://stackoverflow.com/questions/40805182/see-the-files-that-will-be-deploy-to-google-appengine
 - absolute and relative paths on GAE https://stackoverflow.com/questions/5050615/how-to-get-application-root-path-in-gae
+- implicit application credentials https://cloud.google.com/docs/authentication/production#auth-cloud-implicit-python
 
 Feature Roadmap:
-- refine push notification criteria (currently pushes upon new draft, read email, moved to bin)
-- use content of push notification to parse email
-- persisting data and loading to a database to track changes over time - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
-- using java sdk in python runtime
+- [] refine push notification criteria (currently pushes upon new draft, read email, moved to bin)
+- [] use content of push notification to parse email
+- [] persisting data and loading to a database to track changes over time - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
+- [] using java sdk in python runtime
+- [x] setting up logging https://cloud.google.com/logging/docs/setup/python
 
 
 

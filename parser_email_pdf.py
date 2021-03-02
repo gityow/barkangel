@@ -6,6 +6,12 @@ import PyPDF2
 import requests
 import re
 
+####################### LOGGING ###########################
+# Imports Python standard library logging
+import logging
+
+logger = logging.getLogger(__name__)
+##########################################################
 
 with open("paths.yml", "r") as f:
     paths = yaml.load(f, Loader=yaml.FullLoader)
@@ -78,8 +84,8 @@ def parse_etf_holdings(pdf_path: str):
     df_list = []
     try:
         while int(string_list[i]): # index of the row
-            print('index', i)
-            print(string_list[i:i+7])
+            logger.info('index', i)
+            logger.info(string_list[i:i+7])
             df_list.append(string_list[i:i+7])
             i += 7
     except ValueError: # EOF "The principal risks of investing"
@@ -109,7 +115,6 @@ def get_latest_date(pdf_path: str):
     fund_name : str
         [description]
     """
-    pdf_path = "./temp/arkf_etf.pdf"
 
     with open(pdf_path,'rb') as f:
         reader = PyPDF2.PdfFileReader(f)
@@ -122,13 +127,13 @@ def get_latest_date(pdf_path: str):
 
 def parse_email_table(html_string):
     
-    print('parsing new email')
+    logger.info('parsing new email')
     results = pd.read_html(html_string)[0]
     results = results[1:]
     columns = ['Num', 'Fund', 'Date', 'Direction', 'Ticker', 'CUSIP', 'Company', 'Shares', '% of ETF']
     results.columns = columns
 
-    print(results)
+    logger.info(results)
     return results
 
 def get_all_etfs(latest:bool):
@@ -139,25 +144,25 @@ def get_all_etfs(latest:bool):
 
     # DOWNLOAD PDFS
     if latest:
-        print('Downloading all PDFs now')
+        logger.info('Downloading all PDFs now')
         for name in all_etfs:
             url = paths[f'{name}_etf']        
             download_pdf(url, name) # save in temp folder
     
     # PARSE PDF
     for name in all_etfs:
-        print(f'Parsing {name} PDF now')
+        logger.info(f'Parsing {name} PDF now')
         temp_path = paths[f'{name}_etf_path']
          
         result_df = parse_etf_holdings(temp_path)
         update_dt = get_latest_date(temp_path)
         result_df['FUND_NAME'] = name.upper()
         result_df['UPDATE_DT'] = update_dt
-        print(f"{name} PDF updated as of {update_dt}")
+        logger.info(f"{name} PDF updated as of {update_dt}")
 
         all_results = all_results.append(result_df,ignore_index=True)
 
-        print(all_results)
+        logger.info(all_results)
     
     return all_results, update_dt
 
@@ -170,7 +175,7 @@ def compare(email_df: DataFrame, all_etf_df: DataFrame):
     return_cols = ['Fund', 'Ticker', 'Company']
 
     exec_buy = exec_buy[return_cols].sort_values(by='Fund')
-    print(exec_buy)
+    logger.info(exec_buy)
 
     return exec_buy
 

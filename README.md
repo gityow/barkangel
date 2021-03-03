@@ -31,7 +31,7 @@ References:
 - absolute and relative paths on GAE https://stackoverflow.com/questions/5050615/how-to-get-application-root-path-in-gae
 - implicit application credentials https://cloud.google.com/docs/authentication/production#auth-cloud-implicit-python
 - timezone on GAE is UTC (http://timezones.appspot.com/), bark times would be 5 hours ahead of EST.
-
+ 
 Feature Roadmap:
 - [ ] refine push notification criteria (currently pushes upon new draft, read email, moved to bin)
 - [ ] use content of push notification to parse email

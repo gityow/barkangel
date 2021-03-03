@@ -11,7 +11,7 @@ Deploy locally
    `$ export FLASK_ENV=development`
    `$ flask run`
 2. Make a curl request
-`curl --header "Content-Type: application/json" -d @sample_message.json http://localhost:5000/push-handlers/receive_messages?token=test`
+`curl --header "Content-Type: application/json" -d @sample_message.json http://localhost:8080/push-handlers/receive_messages?token=test`
 
 Live app in app engine:
 https://barkangelinvest-1613342810822.nn.r.appspot.com
@@ -31,11 +31,14 @@ References:
 - absolute and relative paths on GAE https://stackoverflow.com/questions/5050615/how-to-get-application-root-path-in-gae
 - implicit application credentials https://cloud.google.com/docs/authentication/production#auth-cloud-implicit-python
 - timezone on GAE is UTC (http://timezones.appspot.com/), bark times would be 5 hours ahead of EST.  
+- Installing Java SDK in GAE https://stackoverflow.com/questions/59925185/installing-java-in-google-app-engine-with-python-runtime
+- Dockerfile with both python and java https://stackoverflow.com/questions/51121875/how-to-run-docker-with-python-and-java
+- Flask Deployment https://stackoverflow.com/questions/54028169/flask-app-deployment-on-google-app-engine-flex-using-docker
 
 Feature Roadmap:
 - [ ] refine push notification criteria (currently pushes upon new draft, read email, moved to bin)
 - [ ] use content of push notification to parse email
-- [ ] persisting data and loading to a database to track changes over time - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
+- [ ] persisting data and loading to a database (ensure pdfs holdings before email, track changes over time) - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
 - [ ] using java sdk in python runtime
 - [x] setting up logging https://cloud.google.com/logging/docs/setup/python
 

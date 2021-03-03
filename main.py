@@ -157,7 +157,7 @@ def task_send_message(dev):
     bot.send(content="Hey there! New Ark Email Received. I'm taking a look at current ARK ETF Holdings... woof!")
 
     # GET PDFs # TODO read from blob
-    all_etfs_df, update_dt = get_all_etfs(latest=False)
+    all_etfs_df, update_dt = get_all_etfs(latest=True)
     logger.info('Parsing complete')
 
     # GET NEW EMAIL

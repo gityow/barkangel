@@ -30,12 +30,13 @@ References:
 - all files deployed on GAE https://stackoverflow.com/questions/40805182/see-the-files-that-will-be-deploy-to-google-appengine
 - absolute and relative paths on GAE https://stackoverflow.com/questions/5050615/how-to-get-application-root-path-in-gae
 - implicit application credentials https://cloud.google.com/docs/authentication/production#auth-cloud-implicit-python
+- timezone on GAE is UTC (http://timezones.appspot.com/), bark times would be 5 hours ahead of EST.
 
 Feature Roadmap:
-- [] refine push notification criteria (currently pushes upon new draft, read email, moved to bin)
-- [] use content of push notification to parse email
-- [] persisting data and loading to a database to track changes over time - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
-- [] using java sdk in python runtime
+- [ ] refine push notification criteria (currently pushes upon new draft, read email, moved to bin)
+- [ ] use content of push notification to parse email
+- [ ] persisting data and loading to a database to track changes over time - https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-code-sample
+- [ ] using java sdk in python runtime
 - [x] setting up logging https://cloud.google.com/logging/docs/setup/python
 
 

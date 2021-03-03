@@ -16,6 +16,8 @@ import base64
 import logging
 
 logger = logging.getLogger(__name__)
+stream = logging.StreamHandler()
+logger.addHandler(stream)
 ####################################################################################
 
 ######################################## LOAD .ENV ########################################
@@ -149,7 +151,7 @@ def find_ark_email():
         
     
     email_date_time = datetime.fromtimestamp(max_epoch_ms).strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(f'found most recent ark email id {max_id} sent on :', email_date_time)
+    logger.info(f'found most recent ark email id {max_id} sent on : {email_date_time}' )
 
     return (max_id, email_date_time)
 

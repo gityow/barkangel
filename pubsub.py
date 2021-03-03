@@ -14,6 +14,8 @@ from google.auth import jwt
 import logging
 
 logger = logging.getLogger(__name__)
+stream = logging.StreamHandler()
+logger.addHandler(stream)
 ##########################################################
 
 ############################# LOAD .ENV #############################

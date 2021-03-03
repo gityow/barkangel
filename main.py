@@ -34,6 +34,9 @@ client.setup_logging()
 import logging
 
 logger = logging.getLogger(__name__)
+stream = logging.StreamHandler()
+logger.addHandler(stream)
+
 ##########################################################
 
 with open("paths.yml", "r") as f:
@@ -55,6 +58,8 @@ app.config['PUBSUB_VERIFICATION_TOKEN'] = \
     os.environ['PUBSUB_VERIFICATION_TOKEN']
 app.config['TOPIC_ID'] = os.environ['TOPIC_ID']
 app.config['PROJECT_ID'] = os.environ['PROJECT_ID']
+
+DEV_MODE = bool(os.environ['DEV_MODE'])
 
 ###################################################
 
@@ -114,7 +119,7 @@ def receive_messages_handler():
     # payload = base64.b64decode(envelope['message']['data'])
     # MESSAGES.append(payload)
     
-    threading.Thread(target=task_send_message, kwargs={'dev':False}).start()  # TODO consider calling this outside to improve latency
+    threading.Thread(target=task_send_message, kwargs={'dev': DEV_MODE}).start()  # TODO consider calling this outside to improve latency
     #task()
     
     # Returning any 2xx status indicates successful receipt of the message.
@@ -152,7 +157,7 @@ def task_send_message(dev):
     bot.send(content="Hey there! New Ark Email Received. I'm taking a look at current ARK ETF Holdings... woof!")
 
     # GET PDFs # TODO read from blob
-    all_etfs_df, update_dt = get_all_etfs(latest=True)
+    all_etfs_df, update_dt = get_all_etfs(latest=False)
     logger.info('Parsing complete')
 
     # GET NEW EMAIL

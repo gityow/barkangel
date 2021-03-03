@@ -5,12 +5,15 @@ from pandas import DataFrame
 import PyPDF2
 import requests
 import re
+import tabula
 
 ####################### LOGGING ###########################
 # Imports Python standard library logging
 import logging
 
 logger = logging.getLogger(__name__)
+stream = logging.StreamHandler()
+logger.addHandler(stream)
 ##########################################################
 
 with open("paths.yml", "r") as f:
@@ -63,6 +66,7 @@ def parse_etf_holdings_java(pdf_path: str):
 
     return result_df
 
+
 def parse_etf_holdings(pdf_path: str):
     columns = [
         "NUM",
@@ -80,15 +84,34 @@ def parse_etf_holdings(pdf_path: str):
     
 
     string_list = contents.split('\n')
+
+    # find EOF "The principal risks of investing"
+    eof_i = set([i for i in range(len(string_list)) if str(i).startswith("The principal risks of investing")])[0]
+    eof_i = 0
+    for j in range(len(string_list)):
+        word = string_list[j]
+        print(word)
+        if str(word).startswith("The principal risks of investing"):
+            eof_i = j
+            break
+
     i = 8
     df_list = []
     try:
-        while int(string_list[i]): # index of the row
-            logger.info('index', i)
+        while i > eof_i: # int(string_list[i]) index of the row
+            logger.info(f'index: {i}')
             logger.info(string_list[i:i+7])
+            # check_inputs(string_list[i:i+7]) # TODO
             df_list.append(string_list[i:i+7])
             i += 7
-    except ValueError: # EOF "The principal risks of investing"
+            if i > eof_i:
+                raise EOFError
+            
+    except EOFError: # EOF "The principal risks of investing"
+        logger.info(f'reached end of file, index is : {i}')
+
+    except: 
+        print(i)
         df = pd.DataFrame(df_list, columns = columns)
     
     return df
@@ -148,13 +171,17 @@ def get_all_etfs(latest:bool):
         for name in all_etfs:
             url = paths[f'{name}_etf']        
             download_pdf(url, name) # save in temp folder
-    
+
     # PARSE PDF
     for name in all_etfs:
         logger.info(f'Parsing {name} PDF now')
-        temp_path = paths[f'{name}_etf_path']
+
+        if latest:
+            temp_path = paths[f'{name}_etf_path']
+        else:
+            temp_path = paths[f'rep_{name}_etf_path']        
          
-        result_df = parse_etf_holdings(temp_path)
+        result_df = parse_etf_holdings_java(temp_path)
         update_dt = get_latest_date(temp_path)
         result_df['FUND_NAME'] = name.upper()
         result_df['UPDATE_DT'] = update_dt
@@ -162,13 +189,14 @@ def get_all_etfs(latest:bool):
 
         all_results = all_results.append(result_df,ignore_index=True)
 
-        logger.info(all_results)
+    logger.info(all_results)
     
     return all_results, update_dt
 
 def compare(email_df: DataFrame, all_etf_df: DataFrame):
     all_etf_df = all_etf_df[~all_etf_df['TICKER'].isnull()]
     merged_df = pd.merge(email_df, all_etf_df, left_on=['Fund', 'Ticker'], right_on=['FUND_NAME','TICKER'] , how='left')
+    logger.info(merged_df)
     cond = (merged_df['Direction'] == 'Buy') & (merged_df['TICKER'].isnull())
     exec_buy = merged_df[cond]
     

@@ -11,7 +11,7 @@ Deploy locally
    `$ export FLASK_ENV=development`
    `$ flask run`
 2. Make a curl request
-`curl --header "Content-Type: application/json" -d @sample_message.json http://localhost:8080/push-handlers/receive_messages?token=test`
+`curl --header "Content-Type: application/json" -d @sample_message.json http://localhost:5000/push-handlers/receive_messages?token=test`
 
 Live app in app engine:
 https://barkangelinvest-1613342810822.nn.r.appspot.com

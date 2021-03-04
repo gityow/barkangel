@@ -21,5 +21,6 @@ google-auth-oauthlib==0.4.2
 google-cloud-core==1.6.0
 google-cloud-logging==2.2.0
 google-cloud-pubsub==2.3.0
+google-cloud-storage==1.36.1
 googleapis-common-protos==1.52.0
 grpc-google-iam-v1==0.12.3

@@ -6,6 +6,7 @@ import yaml
 import base64
 import json
 import os
+import pandas as pd
 
 from google.auth.transport import requests
 from google.cloud import pubsub_v1
@@ -119,7 +120,7 @@ def receive_messages_handler():
     # payload = base64.b64decode(envelope['message']['data'])
     # MESSAGES.append(payload)
     
-    threading.Thread(target=task_send_message, kwargs={'dev': DEV_MODE}).start()  # TODO consider calling this outside to improve latency
+    threading.Thread(target=task_send_message, kwargs={'dev': DEV_MODE}).start()
     #task()
     
     # Returning any 2xx status indicates successful receipt of the message.
@@ -133,8 +134,7 @@ def download_etfs():
             current_app.config['PUBSUB_VERIFICATION_TOKEN']):
         return 'Invalid request', 400
     
-    #threading.Thread(target=task_send_message).start()  # TODO consider calling this outside to improve latency
-
+    threading.Thread(target=task_make_table).start()
     return 'OK', 200
 # [END download]
 
@@ -157,8 +157,10 @@ def task_send_message(dev):
     bot.send(content="Hey there! New Ark Email Received. I'm taking a look at current ARK ETF Holdings... woof!")
 
     # GET PDFs # TODO read from blob
-    all_etfs_df, update_dt = get_all_etfs(latest=True)
-    logger.info('Parsing complete')
+    all_etfs_df = pd.read_csv('all_etfs.csv')
+    update_dt = all_etfs_df['UPDATE_DT'][0]
+    #all_etfs_df, update_dt = get_all_etfs(latest=True)
+    logger.info(f'Loaded ETF holdings, updated as of {update_dt}')
 
     # GET NEW EMAIL
     message_id, email_dt = find_ark_email()
@@ -177,17 +179,18 @@ def task_send_message(dev):
         bot.send("New companies were added:")
         bot.send(pretty_print(exec_buy, email_dt, update_dt))
     
-    pdf_files = [File(f'/tmp/{name}_etf.pdf') for name in paths['etf_names']]
-    bot.send("For full reports see attached", files=pdf_files)
+    #pdf_files = [File(f'/tmp/{name}_etf.pdf') for name in paths['etf_names']] # TODO attach pdf files somehow
+    #bot.send("For full reports see attached", files=pdf_files) # TODO attach pdf files somehow
 
     # RENEW GMAIL WATCH 
     setup_watch()
 
     bot.send("Bark going to sleep now...")
-
-# TODO write to blob        
-def task_make_tables():
+      
+def task_make_table():
     all_etfs_df, update_dt = get_all_etfs(latest=True)
+    all_etfs_df.to_csv('all_etfs.csv')
+    logger.info('Uploaded all etfs to blob. PDF File was last updated {update_dt}')
     
 
 if __name__ == '__main__':

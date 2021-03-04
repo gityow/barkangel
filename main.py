@@ -128,14 +128,11 @@ def receive_messages_handler():
 # [END push]
 
 # [START download]
-@app.route('/download', methods=['POST'])
+@app.route('/download', methods=['GET'])
 def download_etfs():
-    if (request.args.get('token', '') !=
-            current_app.config['PUBSUB_VERIFICATION_TOKEN']):
-        return 'Invalid request', 400
-    
-    threading.Thread(target=task_make_table).start()
-    return 'OK', 200
+    if request.method == 'GET':
+        threading.Thread(target=task_make_table).start()
+        return 'OK', 200
 # [END download]
 
 @app.errorhandler(500)

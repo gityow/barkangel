@@ -1,4 +1,4 @@
 cron:
   - description: "download etf pdfs every weekday morning ahead of the email update"
-    url: "/download"
+    url: "/download?token=test"
     schedule: "every monday, tuesday, wednesday, thursday, friday 8:00"

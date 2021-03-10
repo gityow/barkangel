@@ -105,7 +105,7 @@ def receive_messages_handler():
             current_app.config['PUBSUB_VERIFICATION_TOKEN']):
         return 'Invalid request', 400
     
-    Verify that the push request originates from Cloud Pub/Sub.
+    # Verify that the push request originates from Cloud Pub/Sub.
     try:
         # Get the Cloud Pub/Sub-generated JWT in the "Authorization" header.
         bearer_token = request.headers.get('Authorization')
